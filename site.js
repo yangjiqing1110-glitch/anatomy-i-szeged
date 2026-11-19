@@ -1,3 +1,4 @@
+window.ANAT_FLAT=true;
 /* Anatomy I — Exam Answers · site behaviour */
 (function () {
   "use strict";
@@ -105,7 +106,8 @@
 
   /* ---------------- search ---------------- */
   var DATA = null, loading = false, pending = false;
-  var base = isHome ? ROOT + "condensed/" : "";
+  // flat single-directory deployments (GitHub web upload) prefix the file name instead of using a folder
+  var base = window.ANAT_FLAT ? (isHome ? "condensed-" : ED + "-") : (isHome ? ROOT + "condensed/" : "");
   var indexUrl = ROOT + "" + "search-" + (isHome ? "condensed" : ED) + ".json";
 
   function loadInline(key) {
