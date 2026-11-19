@@ -209,11 +209,18 @@
       sel = -1;
     }
 
-    input.addEventListener("focus", function () { load(); });
+    function schedule(q) {
+      if (!q.trim()) { close(); return; }
+      if (DATA) { render(q); return; }
+      open();
+      box.innerHTML = '<div class="empty">Loading index…</div>';
+      load().then(function () { if (DATA) render(input.value); });
+    }
+    input.addEventListener("focus", function () { load(); if (input.value) schedule(input.value); });
     input.addEventListener("input", function () {
       var q = input.value;
       clearTimeout(timer);
-      timer = setTimeout(function () { render(q); }, 90);
+      timer = setTimeout(function () { schedule(q); }, 90);
     });
     input.addEventListener("keydown", function (e) {
       if (e.key === "Escape") { close(); input.blur(); return; }
