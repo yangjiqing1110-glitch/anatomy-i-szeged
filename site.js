@@ -105,7 +105,7 @@ window.ANAT_FLAT=true;
   }
 
   /* ---------------- search ---------------- */
-  var DATA = null, loading = false, pending = false;
+  var DATA = null, loading = false, pending = false, LOADP = null;
   // flat single-directory deployments (GitHub web upload) prefix the file name instead of using a folder
   var base = window.ANAT_FLAT ? (isHome ? "condensed-" : ED + "-") : (isHome ? ROOT + "condensed/" : "");
   var indexUrl = ROOT + "" + "search-" + (isHome ? "condensed" : ED) + ".json";
@@ -122,17 +122,20 @@ window.ANAT_FLAT=true;
   }
 
   function load() {
-    if (DATA || loading) return Promise.resolve(DATA);
+    if (DATA) return Promise.resolve(DATA);
+    if (LOADP) return LOADP;
     var key = isHome ? "condensed" : ED;
     if (window.ANAT_IDX && window.ANAT_IDX[key]) { DATA = window.ANAT_IDX[key]; return Promise.resolve(DATA); }
     loading = true;
-    return loadInline(key).then(function (idx) {
+    var promise = loadInline(key).then(function (idx) {
       if (idx) { DATA = idx; loading = false; return idx; }
       return fetch(indexUrl)
         .then(function (r) { return r.json(); })
         .then(function (j) { DATA = j; loading = false; return j; })
         .catch(function () { loading = false; return null; });
     });
+    LOADP = promise;
+    return LOADP;
   }
 
   function esc(s) {
